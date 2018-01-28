@@ -3,7 +3,14 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - LevelManager
+  - Trap
+  - Terminal
+  - Spawn
+  - Generator
+  - Keygon
+  - Teleport
   layers:
   - Default
   - TransparentFX

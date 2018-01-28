@@ -34,6 +34,6 @@ public class Help : MonoBehaviour {
     public void Quit() {
         Keygon.score = 0;
         Keygon.deathCount = 0;
-        SceneManager.LoadScene("main");
+        SceneManager.LoadScene("menu");
     }
 }

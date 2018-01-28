@@ -5,6 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class PlayerRobot : MonoBehaviour {
 
+    public AudioClip dieClip;
+
     LevelManager levelManager;
 
     [SerializeField]
@@ -110,12 +112,8 @@ public class PlayerRobot : MonoBehaviour {
         moveToPoint = true;
     }
     public void Wait() {
-        float tempTime = 1;
-        if (tempTime > 0) {
-            tempTime -= Time.deltaTime;
-        } else {
-            moveToPoint = true;
-        }
+        levelManager.wait = true;
+        moveToPoint = true;
     }
     public void Corrupt() {
         RaycastHit hit;
@@ -137,6 +135,8 @@ public class PlayerRobot : MonoBehaviour {
         if (Physics.Raycast(transform.position, fwd, out hit, 1.2f)) {
             if (hit.transform.tag == "Trap" && direction == 1) {
                 KillRobot();
+            } else if (hit.transform.tag == "Teleport" && direction == 1) {
+                hit.transform.GetComponent<Teleport>().Enter(this.gameObject);
             }
             return 1;
         }
@@ -145,6 +145,8 @@ public class PlayerRobot : MonoBehaviour {
         if (Physics.Raycast(transform.position, back, out hit, 1.2f)) {
             if (hit.transform.tag == "Trap" && direction == 2) {
                 KillRobot();
+            } else if (hit.transform.tag == "Teleport" && direction == 1) {
+                hit.transform.GetComponent<Teleport>().Enter(this.gameObject);
             }
             return 2;
         }
@@ -164,6 +166,7 @@ public class PlayerRobot : MonoBehaviour {
     }
 
     void KillRobot() {
+        transform.GetComponent<AudioSource>().PlayOneShot(dieClip);
         levelManager.IncreaseDeathCount();
         SceneManager.LoadScene("main");
     }

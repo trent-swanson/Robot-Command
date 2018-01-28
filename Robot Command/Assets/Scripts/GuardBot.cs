@@ -23,10 +23,51 @@ public class GuardBot : MonoBehaviour {
     private float turnDegree;
     private float turnAngle;
 
-    Vector3 relativePoint;
+    PlayerRobot playerBot;
+
+    public float dirNum;
+
+    void Update() {
+        if (levelManager.playMode) {
+            if (playerBot.commandListPos < playerBot.commandList.Count && !moveToPoint) {
+
+                Debug.Log("currentWaypoint: " + currentWaypoint);
+                Vector3 heading = waypoints[currentWaypoint].position - transform.position;
+                dirNum = AngleDir(transform.forward, heading, transform.up);
+
+                if (dirNum == -1) {
+                    TurnLeft();
+                    Debug.Log("GoingLeft");
+                } else if (dirNum == 1) {
+                    TurnRight();
+                    Debug.Log("GoingRight");
+                } else if (dirNum == 0) {
+                    MoveForward();
+                    Debug.Log("GoingForward");
+                }
+            }
+        }
+    }
+
+
+    float AngleDir(Vector3 fwd, Vector3 targetDir, Vector3 up) {
+        Vector3 perp = Vector3.Cross(fwd, targetDir);
+        float dir = Vector3.Dot(perp, up);
+
+        if (dir > 0f) {
+            return 1f;
+        } else if (dir < 0f) {
+            return -1f;
+        } else {
+            return 0f;
+        }
+    }
+
+
 
     void Start() {
         levelManager = GameObject.FindGameObjectWithTag("LevelManager").GetComponent<LevelManager>();
+        playerBot = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerRobot>();
         endPosition = transform.localPosition;
         endRotation = transform.eulerAngles;
         moveToPoint = true;
@@ -34,50 +75,30 @@ public class GuardBot : MonoBehaviour {
 
     void FixedUpdate() {
         if (transform.localPosition == endPosition && Vector3.Distance(transform.eulerAngles, endRotation) < 0.01f) {
-            levelManager.endOfTurn = true;
+            levelManager.guar1EndOfTurn = true;
             moveToPoint = false;
             timeLerped = 0;
+            currentWaypoint += 1;
+            if (currentWaypoint > waypoints.Count) {
+                currentWaypoint = 0;
+            }
         } else if (levelManager.turnTimer == 0) {
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, endPosition, moveSpeed * Time.deltaTime);
+            //Debug.Log("hi");
             timeLerped += Time.deltaTime;
             turnAngle = Mathf.LerpAngle(transform.rotation.y, turnDegree, Time.deltaTime);
             transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, turnDegree, 0), timeLerped / turnSpeed);
         }
     }
 
-    void Update() {
-        if (levelManager.playMode) {
-            if (!moveToPoint) {
-                relativePoint = transform.InverseTransformPoint(waypoints[currentWaypoint].position);
-                if (relativePoint.x < -0.01) {
-                    //print("Object is to the left");
-                    TurnLeft();
-                }
-                else if (relativePoint.x > 0.01) {
-                    //print("Object is to the right");
-                    TurnRight();
-                }
-                else if (transform.localPosition != waypoints[currentWaypoint].position) {
-                    MoveForward();
-                }
-            }
-        }
-    }
+    
 
     public void MoveForward() {
         endPosition = transform.localPosition + transform.forward * distanceToMove;
-        currentWaypoint += 1;
-        if (currentWaypoint > waypoints.Count) {
-            currentWaypoint = 0;
-        }
         moveToPoint = true;
     }
     public void MoveBack() {
         endPosition = transform.localPosition + -transform.forward * distanceToMove;
-        currentWaypoint += 1;
-        if (currentWaypoint > waypoints.Count) {
-            currentWaypoint = 0;
-        }
         moveToPoint = true;
     }
     public void TurnLeft() {

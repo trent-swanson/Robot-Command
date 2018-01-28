@@ -12,8 +12,10 @@ public class LevelManager : MonoBehaviour {
     public float turnTime = 2f;
     public float turnTimer = 0;
     public bool endOfTurn = false;
+    public bool guar1EndOfTurn = false;
     public bool playMode = false;
     public bool isFirstMove = true;
+    public bool wait = false;
 
     public GameObject robotDeathCount;
 
@@ -28,8 +30,14 @@ public class LevelManager : MonoBehaviour {
     {
         if(!isFirstMove) {
             if (endOfTurn) {
-                turnTimer = turnTime;
+                if (wait) {
+                    turnTimer = turnTime + 2f;
+                } else {
+                    turnTimer = turnTime;
+                }
                 endOfTurn = false;
+                //guar1EndOfTurn = false;
+                wait = false;
             }
             if (turnTimer > 0) {
                 turnTimer -= Time.deltaTime;

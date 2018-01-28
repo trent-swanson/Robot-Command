@@ -5,6 +5,11 @@ using UnityEngine.UI;
 
 public class Terminal : MonoBehaviour {
 
+    public GameObject canvas;
+    public AudioClip transmissionClip;
+    public AudioClip invalidClip;
+    public AudioClip helpClip;
+
     LevelManager levelManager;
     public Help helpPanel;
 
@@ -77,9 +82,10 @@ public class Terminal : MonoBehaviour {
             tempCommand.transform.GetChild(0).GetComponent<Text>().text = "Corrupt";
             playerRobot.AddCommand(6);
         } else if (!finishedExecute && (tempData == "execute" || tempData == "begin" || tempData == "transmit")) {
+            canvas.GetComponent<AudioSource>().PlayOneShot(transmissionClip);
             GameObject tempCommand = Instantiate(commandElement);
             tempCommand.transform.SetParent(commandList.transform);
-            tempCommand.transform.GetChild(0).GetComponent<Text>().text = "Transmit";
+            tempCommand.transform.GetChild(0).GetComponent<Text>().text = "Transmiting";
             playerRobot.Begin();
         } else if (tempData == "restart") {
             GameObject tempCommand = Instantiate(commandElement);
@@ -105,6 +111,7 @@ public class Terminal : MonoBehaviour {
             tempCommand.transform.GetChild(0).GetComponent<Text>().text = "Quit";
             playerRobot.Quit();
         } else if (tempData == "help") {
+            canvas.GetComponent<AudioSource>().PlayOneShot(helpClip);
             GameObject tempCommand = Instantiate(commandElement);
             tempCommand.transform.SetParent(commandList.transform);
             tempCommand.transform.GetChild(0).GetComponent<Text>().text = "Help";
@@ -122,6 +129,7 @@ public class Terminal : MonoBehaviour {
     }
 
     IEnumerator InvalidCommand() {
+        canvas.GetComponent<AudioSource>().PlayOneShot(invalidClip);
         invalidCommandPopUp.GetComponent<Image>().CrossFadeAlpha(1f, 15f * Time.deltaTime, false);
         invalidCommandPopUp.transform.GetChild(0).GetComponent<Text>().CrossFadeAlpha(1f, 15f * Time.deltaTime, false);
         yield return new WaitForSeconds(0.7f);
@@ -130,6 +138,7 @@ public class Terminal : MonoBehaviour {
     }
 
     IEnumerator RestartCommand() {
+        canvas.GetComponent<AudioSource>().PlayOneShot(invalidClip);
         restartCommandPopUp.GetComponent<Image>().CrossFadeAlpha(1f, 15f * Time.deltaTime, false);
         restartCommandPopUp.transform.GetChild(0).GetComponent<Text>().CrossFadeAlpha(1f, 15f * Time.deltaTime, false);
         yield return new WaitForSeconds(0.7f);

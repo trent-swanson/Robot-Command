@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class Generator : MonoBehaviour {
 
+    public AudioClip hackClip;
+
     public Color corruptedColor;
     Keygon keygon;
 
@@ -20,6 +22,7 @@ public class Generator : MonoBehaviour {
     }
 
     public void Corrupted() {
+        transform.GetComponent<AudioSource>().PlayOneShot(hackClip);
         transform.GetChild(0).GetComponent<Light>().color = corruptedColor;
         FindObjectOfType<Keygon>().Score(id);
     }
